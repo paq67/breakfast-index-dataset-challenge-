@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Breakfast Index — An Early Warning System for Inflation</title>
+  <meta name="description"
+    content="Discover how breakfast food prices predict inflation months before official statistics. An interactive data story using real FRED economic data.">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥚</text></svg>">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+  <!-- Particle Background Canvas -->
+  <canvas id="particleBg" class="particle-canvas"></canvas>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Tab Navigation -->
+  <nav class="tab-nav" id="tabNav">
+    <button class="tab-btn active" data-tab="story">
+      <span class="tab-icon">◈</span> Story
+    </button>
+    <button class="tab-btn" data-tab="notebook">
+      <span class="tab-icon">⟨/⟩</span> Notebook
+    </button>
+  </nav>
+
+  <!-- Nav Dots (Story view only) -->
+  <nav class="nav-dots" id="navDots">
+    <button class="nav-dot active" data-section="0" aria-label="Hero"></button>
+    <button class="nav-dot" data-section="1" aria-label="Metrics"></button>
+    <button class="nav-dot" data-section="2" aria-label="Trend"></button>
+    <button class="nav-dot" data-section="3" aria-label="How it works"></button>
+    <button class="nav-dot" data-section="4" aria-label="Lag Analysis"></button>
+    <button class="nav-dot" data-section="5" aria-label="Heatmap"></button>
+    <button class="nav-dot" data-section="6" aria-label="Sankey"></button>
+    <button class="nav-dot" data-section="7" aria-label="Regression"></button>
+    <button class="nav-dot" data-section="8" aria-label="Shock Timeline"></button>
+    <button class="nav-dot" data-section="9" aria-label="Global"></button>
+    <button class="nav-dot" data-section="10" aria-label="Radar"></button>
+    <button class="nav-dot" data-section="11" aria-label="Components"></button>
+    <button class="nav-dot" data-section="12" aria-label="Simulator"></button>
+    <button class="nav-dot" data-section="13" aria-label="Conclusion"></button>
+  </nav>
+
+  <!-- ======================= STORY TAB ======================= -->
+  <div class="tab-content active" id="storyTab">
+
+    <!-- ========================= SECTION 0: HERO ========================= -->
+    <section class="section hero" id="sec-0">
+      <div class="hero-badge reveal">
+        <span class="led-dot"></span>
+        <span>Live Economic Data</span>
+      </div>
+
+      <h1 class="hero-title reveal reveal-delay-1">
+        <span class="emoji">🥚</span> The Breakfast<br>Index
+      </h1>
+
+      <p class="hero-subtitle reveal reveal-delay-2">
+        An early warning system for inflation — built from the price of eggs and bread.
+      </p>
+
+      <div class="scroll-indicator">
+        <span>Scroll</span>
+        <div class="scroll-arrow"></div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 1: KEY METRICS ========================= -->
+    <section class="section" id="sec-1">
+      <div class="section-inner">
+        <div class="section-label reveal">Signal Overview</div>
+        <h2 class="section-title reveal reveal-delay-1">
+          Breakfast prices predict inflation<br>before it shows up in official data.
+        </h2>
+        <p class="section-desc reveal reveal-delay-2">
+          By tracking the cost of everyday essentials — eggs and bread — we can predict CPI shifts with remarkable
+          accuracy.
+        </p>
+
+        <div class="metrics-grid">
+          <div class="metric-card reveal reveal-delay-2">
+            <div class="metric-label">Lead Time</div>
+            <div class="metric-value" data-count="11">0<span class="unit"> months</span></div>
+            <div class="metric-desc">Breakfast prices move before CPI</div>
+          </div>
+
+          <div class="metric-card accent reveal reveal-delay-3">
+            <div class="metric-label">Correlation</div>
+            <div class="metric-value" data-count="0.90" data-decimal="true">0</div>
+            <div class="metric-desc">Pearson r between breakfast index &amp; CPI</div>
+          </div>
+
+          <div class="metric-card reveal reveal-delay-4">
+            <div class="metric-label">Significance</div>
+            <div class="metric-value" style="font-size: clamp(1.6rem, 3vw, 2.4rem)">p &lt; 0.001</div>
+            <div class="metric-desc">Statistically significant relationship</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 2: TREND CHART ========================= -->
+    <section class="section" id="sec-2">
+      <div class="section-inner">
+        <div class="section-label reveal">Main Signal</div>
+        <h2 class="section-title reveal reveal-delay-1">Breakfast Prices vs Inflation</h2>
+        <p class="section-desc reveal reveal-delay-2">
+          Normalized comparison of the Breakfast Index against the Consumer Price Index (CPI). Notice how food prices
+          lead the broader trend.
+        </p>
+
+        <div class="chart-container reveal reveal-delay-3">
+          <div class="chart-header">
+            <div class="chart-title">Normalized Values (Z-Score)</div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background: #f71414;"></div>
+                Breakfast Index
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background: rgba(255,255,255,0.6);"></div>
+                CPI
+              </div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 3: HOW IT WORKS ========================= -->
+    <section class="section" id="sec-3">
+      <div class="section-inner">
+        <div class="section-label reveal">Mechanism</div>
+        <h2 class="section-title reveal reveal-delay-1">How Food Prices<br>Predict Inflation</h2>
+        <p class="section-desc reveal reveal-delay-2">
+          The transmission from food supply shocks to official CPI statistics follows a predictable chain of events.
+        </p>
+
+        <div class="timeline">
+          <div class="timeline-item reveal reveal-delay-1">
+            <div class="timeline-node">01</div>
+            <div class="timeline-content">
+              <h3>Supply Shock Hits</h3>
+              <p>Avian flu outbreaks, droughts, or feed cost increases disrupt the production of basics like eggs and
+                wheat, creating immediate price pressure at the farm gate.</p>
+            </div>
+          </div>
+          <div class="timeline-item reveal reveal-delay-2">
+            <div class="timeline-node">02</div>
+            <div class="timeline-content">
+              <h3>Grocery Prices Rise</h3>
+              <p>Retailers quickly pass costs to consumers. Essentials like eggs and bread reflect shocks within weeks
+                — far faster than durable goods or services.</p>
+            </div>
+          </div>
+          <div class="timeline-item reveal reveal-delay-3">
+            <div class="timeline-node">03</div>
+            <div class="timeline-content">
+              <h3>Cost Pressures Spread</h3>
+              <p>Higher food costs force wage negotiations, increase restaurant prices, and raise input costs for food
+                manufacturers — spreading into the broader economy.</p>
+            </div>
+          </div>
+          <div class="timeline-item reveal reveal-delay-4">
+            <div class="timeline-node">04</div>
+            <div class="timeline-content">
+              <h3>CPI Catches Up</h3>
+              <p>Official CPI statistics, which average hundreds of categories including housing and services, begin
+                to reflect the inflationary pressure — typically 8 to 14 months later.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 4: LAG ANALYSIS ========================= -->
+    <section class="section" id="sec-4">
+      <div class="section-inner">
+        <div class="section-label reveal">Lead-Lag Analysis</div>
+        <h2 class="section-title reveal reveal-delay-1">Correlation at Each Lag</h2>
+        <p class="section-desc reveal reveal-delay-2">
+          We compute the Pearson correlation between the Breakfast Index and CPI shifted forward by 0 to 18 months.
+          The peak reveals the optimal lead time.
+        </p>
+
+        <div class="chart-container reveal reveal-delay-3">
+          <div class="chart-header">
+            <div class="chart-title">Pearson Correlation by Lag (Months)</div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background: #f71414;"></div>
+                Peak Correlation
+              </div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="lagChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 5: HEATMAP ========================= -->
+    <section class="section" id="sec-5">
+      <div class="section-inner">
+        <div class="section-label reveal">Cross-Correlation Matrix</div>
+        <h2 class="section-title reveal reveal-delay-1">Predictive Timing Across<br>Food Categories</h2>
+        <p class="section-desc reveal reveal-delay-2">
+          Correlation strength across time lags for different food items vs CPI. The highlighted column marks where
+          predictive power peaks.
+        </p>
+
+        <div class="chart-container reveal reveal-delay-3">
+          <div class="chart-header">
+            <div class="chart-title">Correlation Heatmap — Lag (Months)</div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background: #380303;"></div>
+                Low
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background: #f71414;"></div>
+                High
+              </div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap" style="height: 280px;">
+            <canvas id="heatmapCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 6: SANKEY ========================= -->
+    <section class="section" id="sec-6">
+      <div class="section-inner">
+        <div class="section-label reveal">Economic Transmission</div>
+        <h2 class="section-title reveal reveal-delay-1">How Shocks Propagate<br>Through the Economy</h2>
+        <p class="section-desc reveal reveal-delay-2">
+          A flow diagram showing the causal chain from supply disruptions to official inflation statistics.
+        </p>
+
+        <div class="chart-container reveal reveal-delay-3">
+          <div class="chart-header">
+            <div class="chart-title">Economic Transmission Flow</div>
+          </div>
+          <div class="chart-canvas-wrap" id="sankeyContainer" style="height: 320px;">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 7: REGRESSION ========================= -->
+    <section class="section" id="sec-7">
+      <div class="section-inner">
+        <div class="section-label reveal">Statistical Model</div>
+        <h2 class="section-title reveal reveal-delay-1">Regression Analysis</h2>
+        <p class="section-desc reveal reveal-delay-2">
+          Scatter plot of the Breakfast Index against CPI (shifted by 11 months) with a linear regression line and 95%
+          confidence band.
+        </p>
+
+        <div class="chart-container reveal reveal-delay-3">
+          <div class="chart-header">
+            <div class="chart-title">Breakfast Index vs CPI (t+11)</div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background: #f71414;"></div>
+                Regression Line
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background: rgba(247,20,20,0.2);"></div>
+                95% CI
+              </div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="regressionCanvas"></canvas>
+          </div>
+        </div>
+
+        <div class="metrics-grid" style="margin-top: 20px;">
+          <div class="metric-card reveal reveal-delay-3">
+            <div class="metric-label">R-Squared</div>
+            <div class="metric-value" style="font-size: clamp(1.6rem, 3vw, 2.2rem)">0.816</div>
+            <div class="metric-desc">Variance explained by model</div>
+          </div>
+          <div class="metric-card accent reveal reveal-delay-4">
+            <div class="metric-label">Slope</div>
+            <div class="metric-value" style="font-size: clamp(1.6rem, 3vw, 2.2rem)">0.822</div>
+            <div class="metric-desc">Near 1:1 relationship</div>
+          </div>
+          <div class="metric-card reveal reveal-delay-5">
+            <div class="metric-label">P-Value</div>
+            <div class="metric-value" style="font-size: clamp(1.4rem, 2.5vw, 1.8rem)">3.41e-48</div>
+            <div class="metric-desc">Extremely significant</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 8: SHOCK TIMELINE ========================= -->
+    <section class="section" id="sec-8">
+      <div class="section-inner">
+        <div class="section-label reveal">Historical Events</div>
+        <h2 class="section-title reveal reveal-delay-1">Shock Timeline</h2>
+        <p class="section-desc reveal reveal-delay-2">
+          Major supply shocks and their impact on the Breakfast Index. Shaded regions highlight periods of significant
+          price spikes.
+        </p>
+
+        <div class="chart-container reveal reveal-delay-3">
+          <div class="chart-header">
+            <div class="chart-title">Breakfast Index — Normalized (Z-Score)</div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background: #8f0d0d;"></div>
+                Baseline
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background: #f71414;"></div>
+                Shock Period
+              </div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="shockCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 9: GLOBAL COMPARISON ========================= -->
+    <section class="section" id="sec-9">
+      <div class="section-inner">
+        <div class="section-label reveal">Global Perspective</div>
+        <h2 class="section-title reveal reveal-delay-1">Food-CPI Correlation<br>Across Regions</h2>
+        <p class="section-desc reveal reveal-delay-2">
+          Comparing the strength of the food price → inflation signal across five major economies. The pattern is
+          global.
+        </p>
+
+        <div class="chart-container reveal reveal-delay-3">
+          <div class="chart-header">
+            <div class="chart-title">Rolling Correlation Coefficient by Region</div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="globalCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 10: RADAR ========================= -->
+    <section class="section" id="sec-10">
+      <div class="section-inner">
+        <div class="section-label reveal">Structural Analysis</div>
+        <h2 class="section-title reveal reveal-delay-1">Regional Differences<br>At a Glance</h2>
+        <p class="section-desc reveal reveal-delay-2">
+          Comparing key characteristics of the food-inflation relationship across select economies.
+        </p>
+
+        <div class="chart-container reveal reveal-delay-3">
+          <div class="chart-header">
+            <div class="chart-title">Multi-Metric Comparison</div>
+          </div>
+          <div class="chart-canvas-wrap" style="height: 400px;">
+            <canvas id="radarCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 11: COMPONENT BREAKDOWN ========================= -->
+    <section class="section" id="sec-11">
+      <div class="section-inner">
+        <div class="section-label reveal">Component Analysis</div>
+        <h2 class="section-title reveal reveal-delay-1">Inside the Index</h2>
+        <p class="section-desc reveal reveal-delay-2">
+          The Breakfast Index is an equal-weighted average of two staple items — eggs and bread. Here's how each has
+          moved over time.
+        </p>
+
+        <div class="components-grid">
+          <div class="component-card reveal reveal-delay-2">
+            <div class="component-header">
+              <div class="component-title">🥚 Eggs</div>
+              <span class="component-change up" id="eggsChange">—</span>
+            </div>
+            <div class="component-price" id="eggsPrice">$—</div>
+            <div class="component-sparkline">
+              <canvas id="eggsSparkline"></canvas>
+            </div>
+          </div>
+
+          <div class="component-card reveal reveal-delay-3">
+            <div class="component-header">
+              <div class="component-title">🍞 Bread</div>
+              <span class="component-change up" id="breadChange">—</span>
+            </div>
+            <div class="component-price" id="breadPrice">$—</div>
+            <div class="component-sparkline">
+              <canvas id="breadSparkline"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-container reveal reveal-delay-4" style="margin-top: 24px;">
+          <div class="chart-header">
+            <div class="chart-title">Components — Normalized Overlay</div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background: #FF6B35;"></div>
+                Eggs
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background: #FFD166;"></div>
+                Bread
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background: rgba(255,255,255,0.5);"></div>
+                CPI
+              </div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="componentChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 12: SIMULATOR ========================= -->
+    <section class="section" id="sec-12">
+      <div class="section-inner">
+        <div class="section-label reveal">Interactive Model</div>
+        <h2 class="section-title reveal reveal-delay-1" style="text-align: center;">Inflation Simulator</h2>
+        <p class="section-desc reveal reveal-delay-2" style="text-align: center; margin: 0 auto;">
+          What happens to inflation when food prices spike? Move the slider to explore the estimated CPI impact.
+        </p>
+
+        <div class="simulator-container reveal reveal-delay-3">
+          <div class="simulator-label">Food Price Increase</div>
+          <div class="simulator-value-display">
+            <span id="sliderValueDisplay">10</span><span class="percent">%</span>
+          </div>
+
+          <div class="slider-container">
+            <input type="range" id="priceSlider" min="0" max="50" value="10" step="1">
+            <div class="slider-labels">
+              <span>0%</span>
+              <span>25%</span>
+              <span>50%</span>
+            </div>
+          </div>
+
+          <div class="gauge-container">
+            <svg width="200" height="200" viewBox="0 0 200 200">
+              <circle class="gauge-bg" cx="100" cy="100" r="85" />
+              <circle class="gauge-fill" id="gaugeFill" cx="100" cy="100" r="85" stroke-dasharray="534"
+                stroke-dashoffset="534" />
+            </svg>
+            <div class="gauge-text">
+              <div class="gauge-number" id="gaugeValue">0.80</div>
+              <div class="gauge-unit">% inflation</div>
+            </div>
+          </div>
+
+          <div class="simulator-result">
+            <div class="sim-result-card">
+              <div class="sim-result-label">Input Spike</div>
+              <div class="sim-result-value" id="simInput">10%</div>
+            </div>
+            <div class="sim-result-card">
+              <div class="sim-result-label">Predicted CPI Impact</div>
+              <div class="sim-result-value impact" id="simOutput">0.80%</div>
+            </div>
+          </div>
+
+          <div class="sim-note">Based on regression coefficient ≈ 0.08 from historical FRED data</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= SECTION 13: CONCLUSION ========================= -->
+    <section class="section" id="sec-13">
+      <div class="section-inner" style="text-align: center;">
+        <div class="section-label reveal" style="justify-content: center;">
+          <span style="display: none;"></span>
+          Conclusion
+        </div>
+
+        <p class="conclusion-text reveal reveal-delay-1">
+          Inflation doesn't begin in spreadsheets or central bank reports.
+          It begins at the <strong>breakfast table</strong>.
+        </p>
+
+        <p class="conclusion-text reveal reveal-delay-2" style="margin-top: 32px; font-size: clamp(1rem, 2vw, 1.3rem);">
+          Food supply shocks ripple through the economy <em>long before</em> they appear
+          in official statistics. The Breakfast Index captures this signal
+          with a <strong>0.90 correlation</strong> and an average <strong>11-month lead time</strong>.
+        </p>
+
+        <div class="footer-label reveal reveal-delay-3">
+          The Breakfast Index
+        </div>
+        <div class="data-source reveal reveal-delay-4">
+          Data: Federal Reserve Economic Data (FRED) — Eggs: APU0000708111 · Bread: APU0000702111 · CPI: CPIAUCSL
+        </div>
+      </div>
+    </section>
+
+  </div><!-- end #storyTab -->
+
+  <!-- ======================= NOTEBOOK TAB ======================= -->
+  <div class="tab-content" id="notebookTab">
+    <div class="notebook-container">
+      <div class="notebook-header">
+        <div class="notebook-title-row">
+          <div class="notebook-icon">⟨/⟩</div>
+          <div>
+            <h2 class="notebook-title">The Code From My Notebook</h2>
+            <p class="notebook-subtitle">Python analysis behind the Breakfast Index</p>
+          </div>
+        </div>
+        <a href="https://github.com" class="notebook-github-btn" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+          </svg>
+          Open in GitHub
+        </a>
+      </div>
+      <div id="notebookContent" class="notebook-cells">
+
+        <div class="notebook-text-cell">
+          <p><strong>[1] The Gathering</strong></p>
+          <p>Ah yes, gathering the data. Because nothing says "I'm a serious financial analyst" like downloading the
+            price of eggs and bread from the Federal Reserve while eating a $9 avocado toast.</p>
+        </div>
+
+        <div class="notebook-cell">
+          <div class="cell-header">
+            <span class="cell-type">Python</span>
+            <span class="cell-label">Data Collection & Processing</span>
+          </div>
+          <pre class="cell-code"><code>import pandas as pd
+import numpy as np
+from fredapi import Fred
+
+fred = Fred(api_key='YOUR_API_KEY')
+
+# Fetch FRED series
+eggs = fred.get_series('APU0000708111')    # Eggs, Grade A, Large
+bread = fred.get_series('APU0000702111')   # Bread, White, Pan
+cpi = fred.get_series('CPIAUCSL')          # CPI All Urban Consumers
+
+# Resample to monthly, align dates
+df = pd.DataFrame({
+    'eggs': eggs.resample('MS').mean(),
+    'bread': bread.resample('MS').mean(),
+    'cpi': cpi.resample('MS').mean()
+}).dropna()
+
+# Compute Breakfast Index (equal-weighted average)
+df['breakfast'] = 0.5 * df['eggs'] + 0.5 * df['bread']
+
+# Z-score normalization
+for col in ['breakfast', 'cpi', 'eggs', 'bread']:
+    df[f'{col}_norm'] = (df[col] - df[col].mean()) / df[col].std()</code></pre>
+        </div>
+
+        <div class="notebook-text-cell">
+          <p><strong>[2] The Magic Relationship</strong></p>
+          <p>Now we calculate cross-correlations. We're sliding the CPI data backward in time to see exactly how long it
+            takes for expensive eggs to fully ruin everything else. The suspense is literally killing my wallet.</p>
+        </div>
+
+        <div class="notebook-cell">
+          <div class="cell-header">
+            <span class="cell-type">Python</span>
+            <span class="cell-label">Cross-Correlation Analysis</span>
+          </div>
+          <pre class="cell-code"><code>from scipy import stats
+
+# Compute lag correlations (0 to 18 months)
+lag_results = []
+for lag in range(19):
+    x = df['breakfast_norm'].values[:-lag] if lag > 0 else df['breakfast_norm'].values
+    y = df['cpi_norm'].values[lag:]
+    r, p = stats.pearsonr(x, y)
+    lag_results.append({'lag': lag, 'r': round(r, 4), 'p': p})
+
+lag_df = pd.DataFrame(lag_results)
+optimal_lag = lag_df.loc[lag_df['r'].idxmax()]
+print(f"Peak correlation: r={optimal_lag['r']} at lag={int(optimal_lag['lag'])} months")</code></pre>
+        </div>
+
+        <div class="notebook-text-cell">
+          <p>And here's what that looks like as a beautifully moody heatmap. Turns out, 11 months is the magic number.
+            It takes 11 months for an egg crisis to become an everything crisis.</p>
+        </div>
+
+        <div class="chart-container" style="margin-top: 16px; margin-bottom: 32px;">
+          <div class="chart-header">
+            <div class="chart-title">Cross-Correlation Heatmap (Notebook)</div>
+          </div>
+          <div class="heatmap-wrapper" style="width: 100%; height: 300px; position: relative;">
+            <canvas id="heatmapCanvasNotebook" style="width: 100%; height: 100%; display: block;"></canvas>
+          </div>
+        </div>
+
+        <div class="notebook-text-cell">
+          <p><strong>[2.5] Wait, how does it actually flow?</strong></p>
+          <p>If you're wondering how the cost of chicken feed eventually makes your Netflix subscription more expensive,
+            here's the pipeline of despair beautifully mapped out.</p>
+        </div>
+
+        <div class="chart-container" style="margin-top: 16px; margin-bottom: 32px;">
+          <div class="chart-header">
+            <div class="chart-title">Economic Transmission Mechanism (Notebook)</div>
+          </div>
+          <div class="chart-canvas-wrap" style="height: 350px;">
+            <div id="sankeyContainerNotebook" style="width: 100%; height: 100%;"></div>
+          </div>
+        </div>
+
+        <div class="notebook-text-cell">
+          <p><strong>[3] The Inevitable Regression</strong></p>
+          <p>Time to draw a line through some dots. If we shift CPI forward by 11 months, we get an R-squared of 0.816.
+            In economics, that's basically clairvoyance.</p>
+        </div>
+
+        <div class="notebook-cell">
+          <div class="cell-header">
+            <span class="cell-type">Python</span>
+            <span class="cell-label">Regression Model</span>
+          </div>
+          <pre class="cell-code"><code># Shift CPI forward by optimal lag
+lag = int(optimal_lag['lag'])
+x = df['breakfast_norm'].values[:-lag]
+y = df['cpi_norm'].values[lag:]
+
+slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+print(f"R²={r_value**2:.3f}, slope={slope:.3f}, p={p_value:.2e}")
+
+# 95% Confidence Interval
+y_pred = slope * x + intercept
+residuals = y - y_pred
+se = np.sqrt(np.sum(residuals**2) / (len(x) - 2))
+ci = 1.96 * se  # 95% CI</code></pre>
+        </div>
+
+        <div class="chart-container" style="margin-top: 16px; margin-bottom: 32px;">
+          <div class="chart-header">
+            <div class="chart-title">Predictive Regression (Notebook)</div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background: rgba(143, 13, 13, 0.8);"></div>
+                Monthly Observations
+              </div>
+              <div class="legend-item" style="color: rgba(247, 20, 20, 0.8);">
+                — Regression Line
+              </div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="regressionCanvasNotebook"></canvas>
+          </div>
+        </div>
+
+        <div class="notebook-text-cell">
+          <p><strong>[4] Let's Look at the Shocks</strong></p>
+          <p>When bad things happen to good chickens, the index spikes. Here it is mapped out. Note the 2015 avian flu,
+            which was basically the rehearsal for 2022.</p>
+        </div>
+
+        <div class="chart-container" style="margin-top: 16px; margin-bottom: 32px;">
+          <div class="chart-header">
+            <div class="chart-title">Historical Shocks (Notebook)</div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="shockCanvasNotebook"></canvas>
+          </div>
+        </div>
+
+        <div class="notebook-text-cell">
+          <p><strong>[5] Global Vibes vs Local Vibes</strong></p>
+          <p>Is this just an American tragedy? Not quite. Let's compare US correlation against the UK, Eurozone, Japan,
+            and India. Spoiler: The UK's breakfast is also highly predictive of their impending doom.</p>
+        </div>
+
+        <div class="chart-container" style="margin-top: 16px; margin-bottom: 32px;">
+          <div class="chart-header">
+            <div class="chart-title">Global Lag Comparisons (Notebook)</div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="globalCanvasNotebook"></canvas>
+          </div>
+        </div>
+
+        <div class="notebook-text-cell">
+          <p><strong>[6] Structural Radar</strong></p>
+          <p>Finally, a spider-web chart to make the presentation look sophisticated for the executives. India reacts
+            extremely fast. Japan barely reacts at all because Japan's inflation is basically a myth.</p>
+        </div>
+
+        <div class="chart-container"
+          style="margin-top: 16px; margin-bottom: 32px; max-width: 600px; margin-left: auto; margin-right: auto;">
+          <div class="chart-header">
+            <div class="chart-title" style="text-align: center; width: 100%;">Market Structures (Notebook)</div>
+          </div>
+          <div class="chart-canvas-wrap" style="height: 400px;">
+            <canvas id="radarCanvasNotebook"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- end #notebookTab -->
+
+  <script src="data.js"></script>
+  <script src="viz-data.js"></script>
+  <script src="particles.js"></script>
+  <script src="app.js"></script>
+  <script src="visualizations.js"></script>
+</body>
+
+</html>
